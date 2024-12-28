@@ -14,8 +14,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                // Use Maven tool configured in Jenkins
-                bat 'mvn clean install'
+                bat 'mvn clean package'
             }
         }
         stage('SonarQube Analysis') {
