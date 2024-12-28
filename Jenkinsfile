@@ -5,6 +5,7 @@ pipeline {
     }
     environment {
         SONAR_SCANNER_HOME = 'C:/Program Files/sonar-scanner-6.2.1.4610-windows-x64/bin' // Update if required
+        SONAR_TOKEN = credentials('sonar-token') // Access SonarQube token from Jenkins credentials
     }
     stages {
         stage('Checkout') {
@@ -18,17 +19,16 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-            environment {
-                SONAR_TOKEN = credentials('sonar-token') // Access SonarQube token from Jenkins credentials
-            }
             steps {
-             bat '''
-                mvn clean verify sonar:sonar \
-                  -Dsonar.projectKey=maven-pipeline \
-                  -Dsonar.projectName="maven-pipeline" \
-                  -Dsonar.host.url=http://localhost:9000 \
-                  -Dsonar.token=$SONAR_TOKEN
-                '''
+                withSonarQubeEnv('sonarqube') {
+                    bat '''
+                        mvn sonar:sonar ^
+                        -Dsonar.projectKey=maven-pipeline \
+                        -Dsonar.projectName="maven-pipeline" \
+                        -Dsonar.host.url=http://localhost:9000 \
+                        -Dsonar.token=$SONAR_TOKEN
+                    '''
+                }
             }
         }
     }
